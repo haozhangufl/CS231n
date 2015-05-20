@@ -17,14 +17,29 @@ def softmax_loss_naive(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
-
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  for i in xrange(X.shape[1]):
+      f = np.dot(W,X[:,i])
+      f -= np.max(f)
+      q = np.exp(f)/np.sum(np.exp(f))
+      loss += -np.log(q[y[i]])
+  
+      for c in xrange(W.shape[0]):
+            if c == y[i]:
+                dW[c,:] += X[:,i].T*(q[c] - 1)
+            else:
+                dW[c,:] += X[:,i].T*q[c]
+        
+  loss = loss/float(X.shape[1])
+  loss += 0.5*reg*np.sum(W * W)
+
+  dW = dW/float(X.shape[1])
+  dW += reg*W        
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -48,7 +63,22 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  
+  score = np.dot(W,X)         # C x N matrix store all the scores
+  score -= np.max(score)
+  F = np.exp(score)
+  sF = np.sum(F,axis=0)   # 1 x N vector store the sum for each sample  
+  Q = F/sF
+  cQ = np.choose(y,Q)
+  loss = -np.sum(np.log(cQ))/(float(X.shape[1]))
+  loss += 0.5*reg*np.sum(W * W)
+    
+  M = np.zeros_like(Q)
+  M[y,xrange(M.shape[1])] = 1
+  D = Q - M
+  dW = np.dot(D,X.T)/(float(X.shape[1]))
+  dW += reg*W
+  
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################

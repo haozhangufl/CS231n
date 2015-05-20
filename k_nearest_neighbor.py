@@ -153,7 +153,7 @@ class KNearestNeighbor:
       # neighbors. Store these labels in closest_y.                           #
       # Hint: Look up the function numpy.argsort.                             #
       #########################################################################
-      sortDist = np.argsort(dists[i,:])              
+      sortDist = np.argsort(dists[i,:])
       closest_y = sortDist[0:k]
       #########################################################################
       # TODO:                                                                 #
